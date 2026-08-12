@@ -314,23 +314,93 @@
       </div>
     </section>
 
-    <section id="appointment" class="appointment">
-      <div class="container appointment-grid">
-        <div>
-          <p class="eyebrow" style="color:#bcecff">Appointments</p>
-          <h2>Book your consultation</h2>
-          <p class="subtle">The form is a front-end template. Connect it to your approved booking system, CRM or secure server before accepting real patient information.</p>
-        </div>
-        <form action="#" method="post">
-          <label><input type="text" name="name" placeholder="Patient name" required /></label>
-          <label><input type="tel" name="phone" placeholder="Phone number" required /></label>
-          <label><select name="specialty"><option>Select specialty</option><option>Emergency Ward</option><option>Cardiology</option><option>Radiology</option><option>Laboratory</option></select></label>
-          <label><input type="date" name="date" /></label>
-          <label><textarea name="message" placeholder="Briefly describe your requirement"></textarea></label>
-          <button class="btn btn-primary" type="submit">Request Appointment</button>
-        </form>
-      </div>
-    </section>
+    <form id="appointmentForm">
+      <label>
+        <input type="text" name="name" placeholder="Patient Name" required>
+      </label>
+      
+      <label>
+        <input type="email" name="email" placeholder="Email Address" required>
+      </label>
+      
+      <label>
+        <input type="tel" name="phone" placeholder="WhatsApp Number with country code" required>
+      </label>
+      
+      <label>
+        <select name="service" required>
+          <option value="">Select Service</option>
+          <option>CT Scan</option>
+          <option>MRI Scan</option>
+          <option>X-Ray</option>
+          <option>Viral Fever Treatment</option>
+          <option>Skin Disease Consultation</option>
+          <option>Grommet Insertion</option>
+          <option>Myringotomy</option>
+          <option>Emergency Consultation</option>
+        </select>
+      </label>
+      
+      <label>
+        <input type="date" name="date">
+      </label>
+      
+      <label>
+        <textarea name="message" placeholder="Additional information"></textarea>
+      </label>
+      
+      <label class="consent">
+        <input type="checkbox" name="consent" required>
+        I agree to receive appointment confirmation by email and WhatsApp.
+      </label>
+      
+      <button class="btn btn-primary" type="submit">
+        Request Appointment
+      </button>
+      
+      <p id="formMessage" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+    <script>
+      const scriptURL = "https://docs.google.com/spreadsheets/d/1-OCzv97BcaNWBMFTK6z0Y4pxcoo0jTVXyMPQb4Y_5p8/edit?usp=drivesdk";
+      const form = document.getElementById("appointmentForm");
+      const statusMessage = document.getElementById("formMessage");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const submitButton = form.querySelector("button");
+        submitButton.disabled = true;
+        statusMessage.textContent =
+          "Submitting your appointment request...";
+        try {
+          const data = Object.fromEntries(new FormData(form));
+          
+          const response = await fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            }
+          });
+          const result = await response.json();
+          if (!result.success) {
+            throw new Error(result.message);
+          }
+          statusMessage.textContent =
+            "Your appointment request has been received. A confirmation will be sent to your email and WhatsApp.";
+          
+          form.reset();
+        
+        } catch (error) {
+          statusMessage.textContent =
+            "Unable to submit the request. Please call the hospital directly.";
+          console.error(error);
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    </script>
+  </section>
 
     <section class="reviews" id="reviews">
       <div class="container">
